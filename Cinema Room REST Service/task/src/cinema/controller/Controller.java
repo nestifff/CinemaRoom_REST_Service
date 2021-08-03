@@ -6,10 +6,7 @@ import cinema.model.SeatRowColumn;
 import cinema.model.TokenTicket;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
 
@@ -20,6 +17,8 @@ public class Controller {
 
     private static final Cinema cinema;
     private static final List<TokenTicket> tokenTickets = new ArrayList<>();
+
+    private static int currentIncome = 0;
 
     static {
 
@@ -65,6 +64,7 @@ public class Controller {
                 } else {
 
                     seat.setBought(true);
+                    currentIncome += seat.getPrice();
 
                     UUID id = randomUUID();
 
@@ -124,6 +124,7 @@ public class Controller {
         }
 
         seat.setBought(false);
+        currentIncome -= seat.getPrice();
 
         Map<String, Object> resp = new LinkedHashMap<>();
         resp.put("returned_ticket", seat);
@@ -132,4 +133,23 @@ public class Controller {
 
     }
 
+    @PostMapping("/stats")
+    public ResponseEntity<?> getStats(
+            @RequestParam(value = "password", required = false) String password
+    ) {
+
+        if (password != null && password.equals("super_secret")) {
+
+            Map<String, Object> resp = new LinkedHashMap<>();
+            resp.put("current_income", currentIncome);
+            resp.put("number_of_available_seats", cinema.getNumOfAvailable());
+            resp.put("number_of_purchased_tickets", 81 - cinema.getNumOfAvailable());
+
+            return new ResponseEntity<>(resp, HttpStatus.OK);
+        }
+
+        Map<String, String> mapErr = new HashMap<>();
+        mapErr.put("error", "The password is wrong!");
+        return new ResponseEntity<>(mapErr, HttpStatus.UNAUTHORIZED);
+    }
 }

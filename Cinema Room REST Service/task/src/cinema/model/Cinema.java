@@ -42,6 +42,17 @@ public class Cinema {
         return newCinema;
     }
 
+    @JsonIgnore
+    public int getNumOfAvailable() {
+        int num = 0;
+        for (Seat seat: availableSeats) {
+            if (!seat.isBought()) {
+                ++num;
+            }
+        }
+        return num;
+    }
+
     @JsonProperty("total_rows")
     public int getTotalRows() {
         return totalRows;
