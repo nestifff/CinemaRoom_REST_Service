@@ -3,6 +3,8 @@ package cinema.model;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import java.util.Objects;
+
 public class Seat {
 
     private int row;
@@ -22,6 +24,7 @@ public class Seat {
         return row;
     }
 
+    @JsonProperty("row")
     public void setRow(int row) {
         this.row = row;
     }
@@ -31,6 +34,7 @@ public class Seat {
         return column;
     }
 
+    @JsonProperty("column")
     public void setColumn(int column) {
         this.column = column;
     }
@@ -46,12 +50,28 @@ public class Seat {
     }
 
     @JsonIgnore
-    public boolean getBought() {
+    public boolean isBought() {
         return isBought;
     }
 
     @JsonIgnore
     public void setBought(boolean bought) {
         isBought = bought;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Seat seat = (Seat) o;
+        return row == seat.row &&
+                column == seat.column &&
+                price == seat.price &&
+                isBought == seat.isBought;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(row, column, price, isBought);
     }
 }

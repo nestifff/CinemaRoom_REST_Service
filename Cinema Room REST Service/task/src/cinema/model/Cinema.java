@@ -5,7 +5,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.zip.CheckedInputStream;
 
 public class Cinema {
 
@@ -15,19 +14,14 @@ public class Cinema {
 
     public Cinema() {}
 
-    public Cinema(int totalRows, int totalColumns) {
+    public Cinema(int totalRows, int totalColumns, List<Seat> list) {
         this.totalRows = totalRows;
         this.totalColumns = totalColumns;
-        availableSeats = new ArrayList<>();
-        for (int i = 1; i <= 9; ++i)
-            for (int j = 1; j <= 9; ++j) {
+        if (list.size() != totalColumns * totalRows) {
+            throw new RuntimeException("Illegal number of seats while creating cinema!");
+        }
+        this.availableSeats = list;
 
-                if (i <= 4) {
-                    availableSeats.add(new Seat(i, j, 10));
-                } else {
-                    availableSeats.add(new Seat(i, j, 8));
-                }
-            }
     }
 
     @JsonIgnore
@@ -39,7 +33,7 @@ public class Cinema {
 
         List<Seat> seats = new ArrayList<>();
         for (Seat oldSeat: availableSeats) {
-            if (!oldSeat.getBought()) {
+            if (!oldSeat.isBought()) {
                 seats.add(oldSeat);
             }
         }
